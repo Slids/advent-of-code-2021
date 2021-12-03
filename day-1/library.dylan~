@@ -1,0 +1,11 @@
+Module: dylan-user
+
+define library day-1
+  use common-dylan;
+  use io;
+end library day-1;
+
+define module day-1
+  use common-dylan;
+  use format-out;
+end module day-1;
