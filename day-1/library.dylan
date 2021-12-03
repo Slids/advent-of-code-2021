@@ -1,14 +1,14 @@
 Module: dylan-user
 
-define library aoc
+define library day-1
   use common-dylan;
   use system;
   use io;
-end library aoc;
+end library;
 
-define module aoc
+define module day-1
   use common-dylan;
   use format-out;
   use file-system;
   use streams;
-end module aoc;
+end module;
