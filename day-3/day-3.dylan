@@ -55,12 +55,8 @@ define function get-list () => (string-list :: <list>)
 end;
 
 define function most-common-bit(string-list :: <list>, index :: <integer>) => (c :: <character>)
-  let int = 0;
-  for (i in string-list)
-    when (i[index] = '1')
-      int := int + 1;
-    end;
-  end;
+  let mapped = map(method (a) string-to-integer(a, start: index, end: index + 1); end, string-list);
+  let int = reduce(\+, 0, mapped);
   if (int >= size(string-list) - int)
     '1';
   else
@@ -68,45 +64,31 @@ define function most-common-bit(string-list :: <list>, index :: <integer>) => (c
   end;
 end;
 
-
-define function bits-to-int (str :: <string>) => (new-int :: <integer>)
-  let new-int = 0;
-  let str-size = size(str);
-  for (i from 0 below str-size)
-    when (str[i] = '1')
-      new-int := set-bit(new-int, str-size - i - 1)
+let oxygen-generator-rating = 0;
+let string-list = get-list();
+block(break)
+  for ( i from 0 below size(string-list[0]))
+    let common-bit = most-common-bit(string-list, i);
+    string-list := choose ( method (a) a[i] = common-bit end, string-list);
+    if (size(string-list) = 1)
+      oxygen-generator-rating := string-to-integer(string-list[0], base: 2);
+      break();
     end;
   end;
-  new-int
 end;
 
-let oxygen-generator-rating-bits = 0;
-let string-list = get-list();
-for ( i from 0 below size(string-list[0]))
-  let common-bit = most-common-bit(string-list, i);
-  string-list := choose ( method (a) a[i] = common-bit end, string-list);
-  if (size(string-list) = 1)
-    oxygen-generator-rating-bits := string-list[0];
-  end;
-end;
-let oxygen-generator-rating = bits-to-int(oxygen-generator-rating-bits);
-
-let c02-scrubbing-bits = 0;
+let c02-scrubbing = 0;
 string-list := get-list();
-for ( i from 0 below size(string-list[0]))
-  let common-bit = most-common-bit(string-list, i);
-  string-list := choose ( method (a) a[i] ~= common-bit end, string-list);
-  if (size(string-list) = 1)
-    c02-scrubbing-bits := string-list[0];
+block(break)
+  for ( i from 0 below size(string-list[0]))
+    let common-bit = most-common-bit(string-list, i);
+    string-list := choose ( method (a) a[i] ~= common-bit end, string-list);
+    if (size(string-list) = 1)
+      c02-scrubbing := string-to-integer(string-list[0], base: 2);
+      break();
+    end;
   end;
 end;
-let c02-scrubbing = bits-to-int(c02-scrubbing-bits);
 
-format-out("Part 2: oxygen-generator-rating-bits: %= oxygen-generator-rating: %=\n",
-           oxygen-generator-rating-bits, oxygen-generator-rating);
-
-format-out("Part 2: c02-scrubbing-bits: %= c02-scrubbing: %=\n",
-           c02-scrubbing-bits, c02-scrubbing);
-
-format-out("Part 2: mult: %=\n",
-           c02-scrubbing * oxygen-generator-rating);
+format-out("Part 2: oxygen-generator-rating: %= c02-scrubbing: %= mult: %=\n",
+           oxygen-generator-rating, c02-scrubbing, c02-scrubbing * oxygen-generator-rating);
