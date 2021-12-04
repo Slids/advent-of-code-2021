@@ -84,12 +84,7 @@ let oxygen-generator-rating-bits = 0;
 let string-list = get-list();
 for ( i from 0 below size(string-list[0]))
   let common-bit = most-common-bit(string-list, i);
-  let list-copy = shallow-copy(string-list);
-  for (remove-me in list-copy)
-    if (remove-me[i] ~= common-bit)
-      string-list := remove!(string-list, remove-me);
-    end;
-  end;
+  string-list := choose ( method (a) a[i] = common-bit end, string-list);
   if (size(string-list) = 1)
     oxygen-generator-rating-bits := string-list[0];
   end;
@@ -100,12 +95,7 @@ let c02-scrubbing-bits = 0;
 string-list := get-list();
 for ( i from 0 below size(string-list[0]))
   let common-bit = most-common-bit(string-list, i);
-  let list-copy = shallow-copy(string-list);
-  for (remove-me in list-copy)
-    if (remove-me[i] = common-bit)
-      string-list := remove!(string-list, remove-me);
-    end;
-  end;
+  string-list := choose ( method (a) a[i] ~= common-bit end, string-list);
   if (size(string-list) = 1)
     c02-scrubbing-bits := string-list[0];
   end;
