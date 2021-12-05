@@ -94,35 +94,37 @@ define function find-win-and-score(drawn-numbers :: <sequence>, board :: <sequen
   win-time-and-score;
 end;
 
-with-open-file(file-stream = "list.txt")
-  // get the vector of choices
-  let line = read-line(file-stream);
-  let drawn-numbers = get-int-vector-from-string(line, ",");
+define function get-solution(comparator :: <function>) => (final-win :: <sequence>)
   let final-win = #[-1, -1];
-  read-line(file-stream);
-  while (~stream-at-end?(file-stream))
-    let board = get-board(file-stream);
-    let win-and-score = find-win-and-score(drawn-numbers, board);
-    if (final-win[0] = -1 | final-win[0] > win-and-score[0])
-      final-win := win-and-score
+  with-open-file(file-stream = "list.txt")
+    // get the vector of choices
+    let line = read-line(file-stream);
+    let drawn-numbers = get-int-vector-from-string(line, ",");
+    read-line(file-stream);
+    while (~stream-at-end?(file-stream))
+      let board = get-board(file-stream);
+      let win-and-score = find-win-and-score(drawn-numbers, board);
+      if (final-win[0] = -1 | comparator(final-win[0], win-and-score[0]))
+        final-win := win-and-score
+      end;
     end;
   end;
-  format-out("Part 1 final score %= \n", final-win);
+  final-win
 end;
 
-
-with-open-file(file-stream = "list.txt")
-  // get the vector of choices
-  let line = read-line(file-stream);
-  let drawn-numbers = get-int-vector-from-string(line, ",");
-  let final-win = #[-1, -1];
-  read-line(file-stream);
-  while (~stream-at-end?(file-stream))
-    let board = get-board(file-stream);
-    let win-and-score = find-win-and-score(drawn-numbers, board);
-    if (final-win[0] = -1 | final-win[0] < win-and-score[0])
-      final-win := win-and-score
-    end;
-  end;
-  format-out("Part 2 final score %= \n", final-win);
+define function part-1() => ()
+  format-out("Part 1 final score %d \n",
+             get-solution(method (current :: <integer>, new :: <integer>) current > new; end)[1]);
 end;
+
+define function part-2() => ()
+  format-out("Part 2 final score %d \n",
+             get-solution(method (current :: <integer>, new :: <integer>) current < new; end)[1]);
+end;
+
+define function main() => ()
+  part-1();
+  part-2();
+end;
+
+main();
