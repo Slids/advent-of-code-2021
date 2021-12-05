@@ -4,7 +4,7 @@ Author:
 Copyright:
 
 define function get-int-vector-from-string(str :: <string>, sep :: <string>) => (ns :: <sequence>)
-  map(\string-to-integer, split(str, sep, remove-if-empty?: #t))
+  map(string-to-integer, split(str, sep, remove-if-empty?: #t))
 end;
 
 define function get-board (stream :: <file-stream>) => (board :: <array>)
@@ -44,22 +44,25 @@ define function check-win?(board :: <sequence>) => (win :: <boolean>)
 end;
 
 define function score-board(board :: <sequence>) => (score :: <integer>)
-  let value-or-0 = method (i) if (i = #t) 0 else i end; end;
-  let reduce-row = method (row) reduce1(\+, map(\value-or-0, row)) end;
-  reduce1(\+, map(\reduce-row, board));
+  local
+    method value-or-0 (i) if (i = #t) 0 else i end; end,
+    method reduce-row (row) reduce1(\+, map(value-or-0, row)) end;
+  reduce1(\+, map(reduce-row, board));
 end;
 
-define function find-win-and-score(drawn-numbers :: <sequence>, board :: <sequence>) => (res :: <vector>)
+// Returns either the win-time and score (integers) or #f if no win.
+define function find-win-and-score
+    (drawn-numbers :: <sequence>, board :: <sequence>) => (win-time, score)
   let number-map = make(<table>);
   for (i from 0 below size(board))
     for (j from 0 below size(board))
       let entry = make(<vector>, size: 2);
       entry[0] := i;
       entry[1] := j;
+      // Feels like this would be more straight-forward using a 3-dimensional array.
       number-map[board[i][j]] := entry;
     end;
   end;
-  let win-time-and-score = make(<vector>, size: 2);
   block(return-win)
     for (i from 0 below size(drawn-numbers))
       let number = drawn-numbers[i];
@@ -67,14 +70,11 @@ define function find-win-and-score(drawn-numbers :: <sequence>, board :: <sequen
       when (address)
         board[address[0]][address[1]] := #t;
         when (check-win?(board))
-          win-time-and-score[0] := i;
-          win-time-and-score[1] := score-board(board) * number;
-          return-win();
+          return-win(i, score-board(board) * number)
         end;
       end;
     end;
   end;
-  win-time-and-score;
 end;
 
 define function get-solution(comparator :: <function>) => (final-win :: <sequence>)
@@ -86,9 +86,11 @@ define function get-solution(comparator :: <function>) => (final-win :: <sequenc
     read-line(file-stream);
     while (~stream-at-end?(file-stream))
       let board = get-board(file-stream);
-      let win-and-score = find-win-and-score(drawn-numbers, board);
-      if (final-win[0] = -1 | comparator(final-win[0], win-and-score[0]))
-        final-win := win-and-score
+      let (win-time, score) = find-win-and-score(drawn-numbers, board);
+      if (final-win[0] = -1 | comparator(final-win[0], win-time))
+        // I would change final-win to be two distinct values as well, and return them
+        // from this function. Not going to do it now; it's late.
+        final-win := vector(win-time, score)
       end;
     end;
   end;
@@ -97,12 +99,12 @@ end;
 
 define function part-1() => ()
   format-out("Part 1 final score %d \n",
-             get-solution(method (current :: <integer>, new :: <integer>) current > new; end)[1]);
+             get-solution(\>)[1]);
 end;
 
 define function part-2() => ()
   format-out("Part 2 final score %d \n",
-             get-solution(method (current :: <integer>, new :: <integer>) current < new; end)[1]);
+             get-solution(\<)[1]);
 end;
 
 define function main() => ()
