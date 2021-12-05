@@ -13,7 +13,6 @@ define function get-board (stream :: <file-stream>) => (board :: <array>)
     while (~stream-at-end?(stream))
       let line = read-line(stream);
       if (string-equal?(line, ""))
-        format-out("Part 1: board: %=\n", board);
         make-board();
       end;
       add!(board, get-int-vector-from-string(line, " "));
@@ -21,6 +20,13 @@ define function get-board (stream :: <file-stream>) => (board :: <array>)
   end;
   board;
 end;
+
+// useful for debugging
+// define function print-board(board :: <sequence>) => ()
+//   for (row in board)
+//     format-out( "B: %=\n", row);
+//   end;
+// end;
 
 define function check-win?(board :: <sequence>) => (win :: <boolean>)
   // check row
@@ -32,9 +38,9 @@ define function check-win?(board :: <sequence>) => (win :: <boolean>)
     //collumn is harder...
     let win = #f;
     block (won)
-      for (i from 0 to size(board[0]))
+      for (i from 0 below size(board[0]))
         block (continue)
-          for (j from 0 to size(board))
+          for (j from 0 below size(board))
             if (board[j][i] ~= #t)
               continue();
             end;
@@ -67,35 +73,56 @@ define function find-win-and-score(drawn-numbers :: <sequence>, board :: <sequen
       let entry = make(<vector>, size: 2);
       entry[0] := i;
       entry[1] := j;
-      number-map[entry] := board[i][j];
+      number-map[board[i][j]] := entry;
     end;
   end;
-  // let win-time-and-score = make(<vector>, size: 2);
-  // block(return-win)
-  //   for (i from 0 below drawn-numbers)
-  //     let number = drawn-numbers[i];
-  //     let address = element(number-map, number, default: #f);
-  //     when (address)
-  //       board[address[0]][address[1]] := #t;
-  //       when (check-win?(board))
-  //         win-time-and-score[0] := i;
-  //         win-time-and-score[1] := score-board(board) * number;
-  //       end;
-  //     end;
-  //   end;
-  // end;
-  // win-time-and-score;
-  #[0]
+  let win-time-and-score = make(<vector>, size: 2);
+  block(return-win)
+    for (i from 0 below size(drawn-numbers))
+      let number = drawn-numbers[i];
+      let address = element(number-map, number, default: #f);
+      when (address)
+        board[address[0]][address[1]] := #t;
+        when (check-win?(board))
+          win-time-and-score[0] := i;
+          win-time-and-score[1] := score-board(board) * number;
+          return-win();
+        end;
+      end;
+    end;
+  end;
+  win-time-and-score;
 end;
 
-with-open-file(file-stream = "example-list.txt")
+with-open-file(file-stream = "list.txt")
   // get the vector of choices
   let line = read-line(file-stream);
   let drawn-numbers = get-int-vector-from-string(line, ",");
-  format-out("Part 1: numbers: %=\n", drawn-numbers);
+  let final-win = #[-1, -1];
   read-line(file-stream);
   while (~stream-at-end?(file-stream))
     let board = get-board(file-stream);
-    format-out("score %s", find-win-and-score(board, drawn-numbers));
+    let win-and-score = find-win-and-score(drawn-numbers, board);
+    if (final-win[0] = -1 | final-win[0] > win-and-score[0])
+      final-win := win-and-score
+    end;
   end;
+  format-out("Part 1 final score %= \n", final-win);
+end;
+
+
+with-open-file(file-stream = "list.txt")
+  // get the vector of choices
+  let line = read-line(file-stream);
+  let drawn-numbers = get-int-vector-from-string(line, ",");
+  let final-win = #[-1, -1];
+  read-line(file-stream);
+  while (~stream-at-end?(file-stream))
+    let board = get-board(file-stream);
+    let win-and-score = find-win-and-score(drawn-numbers, board);
+    if (final-win[0] = -1 | final-win[0] < win-and-score[0])
+      final-win := win-and-score
+    end;
+  end;
+  format-out("Part 2 final score %= \n", final-win);
 end;
