@@ -44,15 +44,9 @@ define function check-win?(board :: <sequence>) => (win :: <boolean>)
 end;
 
 define function score-board(board :: <sequence>) => (score :: <integer>)
-  let sum = 0;
-  for ( row in board)
-    for (entry in row)
-      if (entry ~= #t)
-        sum := sum + entry
-      end;
-    end;
-  end;
-  sum;
+  let value-or-0 = method (i) if (i = #t) 0 else i end; end;
+  let reduce-row = method (row) reduce1(\+, map(\value-or-0, row)) end;
+  reduce1(\+, map(\reduce-row, board));
 end;
 
 define function find-win-and-score(drawn-numbers :: <sequence>, board :: <sequence>) => (res :: <vector>)
