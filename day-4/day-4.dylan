@@ -29,28 +29,17 @@ end;
 // end;
 
 define function check-win?(board :: <sequence>) => (win :: <boolean>)
-  // check row
   let all-true = method (el) el = #t end;
-
+  // check row
   if (any?( method (seq) every?(all-true, seq) end, board))
     #t;
   else
-    //collumn is harder...
-    let win = #f;
-    block (won)
-      for (i from 0 below size(board[0]))
-        block (continue)
-          for (j from 0 below size(board))
-            if (board[j][i] ~= #t)
-              continue();
-            end;
-          end;
-          win := #t;
-          won();
-        end;
-      end;
+    // check column
+    let index-array = make(<array>, size: size(board[0]));
+    for (i from 0 below size(board[0]))
+      index-array[i] := i;
     end;
-    win;
+    any?(method (i) every?(method (row) row[i] = #t end, board) end, index-array);
   end;
 end;
 
