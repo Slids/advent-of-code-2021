@@ -32,7 +32,7 @@ format-out("Part 1: smallest-distance: %d \n", smallest-distance);
 smallest-distance := max-crab * size(crabs) * 100;
 for (i from 0 below max-crab)
   let distance = method (point)  abs(point - i) end;
-  let total-distance = reduce1(\+, map(triangular, map(distance, crabs)));
+  let total-distance = reduce1(\+, map( compose(triangular, distance), crabs));
   when (smallest-distance > total-distance)
     smallest-distance := total-distance
   end;
