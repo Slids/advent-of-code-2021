@@ -14,5 +14,6 @@ define module day-9
   use strings;
   use file-system;
   use format-out;
+  use format;
   use streams;
 end module day-9;
