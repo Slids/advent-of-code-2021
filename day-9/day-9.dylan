@@ -3,14 +3,6 @@ Synopsis:
 Author:
 Copyright:
 
-define function get-int-vector-from-string(str :: <string>) => (ns :: <sequence>)
-  let vec = make(<stretchy-vector>);
-  for (i in str)
-    add!(vec, string-to-integer(format-to-string("%c", i)));
-  end;
-  vec;
-end;
-
 define function get-cave-map () => (map :: <sequence>)
   let cave-map = make(<stretchy-vector>);
   with-open-file(file-stream = "list.txt")
