@@ -4,18 +4,9 @@ Author:
 Copyright:
 
 define function increment-neighbors(oct-map :: <sequence>, point :: <sequence>) => ()
-  for (i in #[-1, 0, 1])
-    for (j in #[-1, 0, 1])
-      unless (i = 0 & j = 0)
-        let new-x = point[0] + i;
-        let new-y = point[1] + j;
-        if (0 <= new-x & new-x < size(oct-map) &
-              0 <= new-y & new-y < size(oct-map[0]))
-          oct-map[new-x][new-y] := oct-map[new-x][new-y] + 1;
-        end;
-      end;
-    end;
-  end
+  for (neighbor in get-neighbors(oct-map, point, include-diagonals: #t))
+    oct-map[neighbor[0]][neighbor[1]] := oct-map[neighbor[0]][neighbor[1]] + 1;
+  end;
 end;
 
 define function flashing-points (oct-map :: <sequence>, flash-map :: <sequence>) => (points :: <sequence>)
@@ -72,13 +63,13 @@ define function step(oct-map :: <sequence>) => (num-flashes :: <integer>)
   num-flashed;
 end;
 
-define function get-int-vector-from-string(str :: <string>) => (ns :: <sequence>)
-  let vec = make(<stretchy-vector>);
-  for (i in str)
-    add!(vec, string-to-integer(format-to-string("%c", i)));
-  end;
-  vec;
-end;
+// define function get-int-vector-from-string(str :: <string>) => (ns :: <sequence>)
+//   let vec = make(<stretchy-vector>);
+//   for (i in str)
+//     add!(vec, string-to-integer(format-to-string("%c", i)));
+//   end;
+//   vec;
+// end;
 
 define function get-oct-map () => (oct-map :: <sequence>)
   let oct-map = make(<stretchy-vector>);

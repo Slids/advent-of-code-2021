@@ -6,6 +6,7 @@ define library day-11
   use generic-arithmetic;
   use system;
   use strings;
+  use shared;
 end library day-11;
 
 define module day-11
@@ -16,4 +17,5 @@ define module day-11
   use format-out;
   use format;
   use streams;
+  use shared;
 end module day-11;

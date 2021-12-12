@@ -11,6 +11,6 @@ define module shared
   use common-dylan;
   use format-out;
 
-  export
-    get-int-vector-from-string;
+  export get-int-vector-from-string;
+  export get-neighbors;
 end module shared;
