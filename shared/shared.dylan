@@ -33,3 +33,9 @@ define function get-neighbors(matrix :: <sequence>, point :: <sequence>, #key in
   end;
   neighbors;
 end;
+
+define function print-map( m :: <table>) => ()
+  for (value keyed-by key in m)
+    format-out("Key: %= Value: %=\n", key, value);
+  end;
+end;

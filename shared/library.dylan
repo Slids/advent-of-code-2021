@@ -13,4 +13,5 @@ define module shared
 
   export get-int-vector-from-string;
   export get-neighbors;
+  export print-map;
 end module shared;
