@@ -33,11 +33,10 @@ define function find-num-paths(cave-map :: <string-table>, place :: <string>, vi
     num-paths := 1;
   else
     for (next-place in cave-map[place])
-      let new-visited-place = visited-places;
       if (member?(next-place, visited-places, test: string-equal?) & ~small-twice)
-        num-paths := num-paths + find-num-paths(cave-map, next-place, new-visited-place, #t);
+        num-paths := num-paths + find-num-paths(cave-map, next-place, visited-places, #t);
       elseif (~member?(next-place, visited-places, test: string-equal?))
-        num-paths := num-paths + find-num-paths(cave-map, next-place, new-visited-place, small-twice);
+        num-paths := num-paths + find-num-paths(cave-map, next-place, visited-places, small-twice);
       end;
     end;
   end;
