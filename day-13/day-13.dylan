@@ -33,26 +33,18 @@ end;
 
 define function fold-paper(x-or-y :: <character>, number :: <integer>, points :: <sequence>)
  => (new-points :: <sequence>)
-  local method fold-x (value)
-          if (value[0] < number)
+  local method fold (value, pos)
+          if (value[pos] < number)
             value;
           else
-            value[0] := (2 * number) - value[0];
-            value;
-          end;
-        end;
-  local method fold-y (value)
-          if (value[1] < number)
-            value;
-          else
-            value[1] := (2 * number) - value[1];
+            value[pos] := (2 * number) - value[pos];
             value;
           end;
         end;
   if (x-or-y = 'x')
-    map-into(points, fold-x, points);
+    map-into(points, rcurry(fold, 0), points);
   else
-    map-into(points, fold-y, points);
+    map-into(points, rcurry(fold, 1), points);
   end;
   remove-duplicates!(points, test: method(a,b) a[0] = b[0] & a[1] = b[1] end);
 end;
