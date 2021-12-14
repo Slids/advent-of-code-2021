@@ -43,17 +43,17 @@ define function fold-paper(x-or-y :: <character>, number :: <integer>, points ::
           end;
         end;
   map-into(points, fold, points);
-  remove-duplicates!(points, test: method(a,b) a[0] = b[0] & a[1] = b[1] end);
+  remove-duplicates!(points, test: \=);
 end;
 
 define function print-points(points :: <sequence>) => ()
   let max-x-y = get-max-x-y(points);
   for (y from 0 to max-x-y[1])
     for (x from 0 to max-x-y[0])
-      if (member?(vector(x, y), points, test: method(a,b) a[0] = b[0] & a[1] = b[1] end))
+      if (member?(vector(x, y), points, test: \=))
         format-out("#");
       else
-        format-out(".");
+        format-out(" ");
       end;
     end;
     format-out("\n");
