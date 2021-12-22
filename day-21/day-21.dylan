@@ -94,14 +94,24 @@ define function update-game(gs :: <game-state>, player-number :: <integer>, roll
   gs.scores[player-number] >= 21;
 end;
 
-// define function group-games(games :: <sequence>)
-//   let possible-scores := map(scores, games);
-//   let possible-player-pos := map(player-pos, games);
-//   remove-duplicates
-//   for (score in scores)
-//     for
+define function group-games(games :: <sequence>)
+  let new-game-set = make(<stretchy-vector>);
+  let t = make(<table>);
+  let v-to-s = method (a) a[0] + (100 * a[1]) + (10000 * a[2]) + (1000000 * a[3]) end;
 
-// end;
+  let a-to-s = method (a0, a1, a2, a3) a0 + (100 * a1) + (10000 * a2) + (1000000 * a3) end;
+  for (game in games)
+    let hash-val = a-to-s(game.scores[0], game.scores[1], game.player-pos[0], game.player-pos[1]);
+    let e = element(t, hash-val, default: #f);
+    if (e)
+      e.number-of-universes := e.number-of-universes + game.number-of-universes;
+    else
+      t[hash-val] := copy-game-state(game);
+      add!(new-game-set, t[hash-val]);
+    end;
+  end;
+  new-game-set
+end;
 
 define function dirac-dice (players :: <sequence>)
   let possible-rolls = #[3,4,5,6,7,8,9];
@@ -126,7 +136,7 @@ define function dirac-dice (players :: <sequence>)
 
   while (size(games) > 0)
     turn-number := turn-number + 1;
-    format-out("size of games: %= turn-number %=\n", size(games));
+    format-out("size of games: %= turn-number %=\n", size(games), turn-number);
     force-out();
     let new-game-set = make(<stretchy-vector>);
     for (i from 0 below size(possible-rolls))
@@ -142,7 +152,7 @@ define function dirac-dice (players :: <sequence>)
       end;
     end;
     player-number := modulo(player-number + 1, 2);
-    games := new-game-set;
+    games := group-games(new-game-set);
   end;
   format-out("number of universe wins: %=\n", number-of-universe-win);
 end;
